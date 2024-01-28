@@ -17,7 +17,12 @@ prepare_react_native_project!
 #   dependencies: {
 #     ...(process.env.NO_FLIPPER ? { 'react-native-flipper': { platforms: { ios: null } } } : {}),
 # ```
-flipper_config = ENV['NO_FLIPPER'] == "1" ? FlipperConfiguration.disabled : FlipperConfiguration.enabled
+# flipper_config = ENV['NO_FLIPPER'] == "1" ? FlipperConfiguration.disabled : FlipperConfiguration.enabled
+
+# @react-native-firebase/app changes Start - diasbling flipper
+flipper_config =  FlipperConfiguration.disabled
+# @react-native-firebase/app changes End - diasbling flipper
+
 
 linkage = ENV['USE_FRAMEWORKS']
 if linkage != nil
@@ -27,7 +32,10 @@ end
 
 target 'QeeperApp' do
   config = use_native_modules!
-
+  # @react-native-firebase/app changes Start
+  use_frameworks! :linkage => :static
+  $RNFirebaseAsStaticFramework = true
+  # @react-native-firebase/app changes End
   use_react_native!(
     :path => config[:reactNativePath],
     # Enables Flipper.
@@ -53,3 +61,12 @@ target 'QeeperApp' do
     )
   end
 end
+
+# @notifee/react-native changes Start
+$NotifeeExtension = true
+
+target 'NotifeeNotificationService' do
+  use_frameworks! :linkage => :static
+  pod 'RNNotifeeCore', :path => '../node_modules/@notifee/react-native/RNNotifeeCore.podspec'
+end
+# @notifee/react-native changes End
